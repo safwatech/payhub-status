@@ -36,11 +36,23 @@ cp global.css "$EXPORT/global.css"
 
 echo "→ Injecting favicon + theme/UI scripts into rendered <head>"
 python3 - <<'PY'
-import pathlib
+import pathlib, re
 p = pathlib.Path("site/status-page/__sapper__/export/index.html")
 html = p.read_text()
 
-# ── Favicon links ─────────────────────────────────────────────────────
+def replace_or_inject(html, tag_id, new_block):
+    """For script tags identified by id=, replace the existing tag if
+    present so updates to the script body actually deploy. Falls back to
+    a one-shot inject before </head>."""
+    pattern = re.compile(
+        r'<script[^>]*\bid=["\']' + re.escape(tag_id) + r'["\'][^>]*>.*?</script>',
+        re.S,
+    )
+    if pattern.search(html):
+        return pattern.sub(new_block, html, count=1), "replaced"
+    return html.replace("</head>", new_block + "</head>", 1), "injected"
+
+# ── Favicon links (substring-guarded — sequence of <link>s, no id) ────
 favicon_marker = "apple-touch-icon"
 favicon_tags = (
     '<link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">'
@@ -61,7 +73,6 @@ else:
 # attribute so the prefers-color-scheme media query in global.css takes
 # over. Bumping the cache key version (v2) invalidates the previous
 # default of "system" without surprising users who had explicitly chosen.
-early_marker = "ph-theme-init"
 early_script = """<script id="ph-theme-init">
 (function(){var k="payhub-theme";var t=localStorage.getItem(k);
 if(t!=="dark"&&t!=="light"&&t!=="system"){t="light";localStorage.setItem(k,t);}
@@ -73,19 +84,15 @@ if(v==="dark"||v==="light"){document.documentElement.setAttribute("data-theme",v
 else{document.documentElement.removeAttribute("data-theme");}}};
 })();
 </script>"""
-if early_marker not in html:
-    html = html.replace("</head>", early_script + "</head>", 1)
-    print("  ✓ early theme script injected")
-else:
-    print("  ✓ early theme script already present")
+html, action = replace_or_inject(html, "ph-theme-init", early_script)
+print(f"  ✓ early theme script {action}")
 
 # ── UI enhancements script (runs after SPA hydrates) ──────────────────
 # Adds the theme-toggle button to the nav, tags the time-range tab
 # container so global.css can style it as a segmented control, and
 # tracks the active tab via a click listener. MutationObserver handles
 # the SPA mounting/remounting elements during navigation.
-ui_marker = "ph-ui-enhance"
-ui_script = """<script id="ph-ui-enhance" defer>
+ui_script = """<script id="ph-ui-enhance">
 (function(){
   // The Upptime status-page is a Sapper SPA — its DOM appears after
   // hydration. We tag stable DOM hooks (data-ph-* attributes) here so
@@ -139,21 +146,26 @@ ui_script = """<script id="ph-ui-enhance" defer>
 
   function run(){buildToggle();tagRangeTabs();}
 
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",run);
-  }else{
+  function setup(){
     run();
+    // SPA re-renders main on hydration / route changes — re-tag as needed.
+    // document.body is null until parsing reaches <body>; this runs after
+    // DOMContentLoaded (or when readyState is past "loading"), so body is
+    // guaranteed to exist. (`defer` on inline scripts is a no-op, hence
+    // the explicit ready-state branching.)
+    var obs=new MutationObserver(function(){run();});
+    obs.observe(document.body,{childList:true,subtree:true});
   }
-  // SPA re-renders main on hydration / route changes — re-tag as needed.
-  var obs=new MutationObserver(function(){run();});
-  obs.observe(document.body,{childList:true,subtree:true});
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",setup);
+  }else{
+    setup();
+  }
 })();
 </script>"""
-if ui_marker not in html:
-    html = html.replace("</head>", ui_script + "</head>", 1)
-    print("  ✓ UI enhancement script injected")
-else:
-    print("  ✓ UI enhancement script already present")
+html, action = replace_or_inject(html, "ph-ui-enhance", ui_script)
+print(f"  ✓ UI enhancement script {action}")
 
 p.write_text(html)
 PY
