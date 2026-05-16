@@ -5,7 +5,7 @@ sites:
   - name: PayHub App
     url: https://app.payhub.ly/
     expectedStatusCodes: [200]
-    icon: https://cdn.jsdelivr.net/gh/safwatech/payhub-status@main/assets/icon.png
+    icon: https://status.payhub.ly/icon.png
     maxRetries: 3
 
   - name: PayHub API
@@ -25,12 +25,7 @@ sites:
 
 status-website:
   cname: status.payhub.ly
-  logoUrl: https://cdn.jsdelivr.net/gh/safwatech/payhub-status@main/assets/icon.png
-  # Custom CSS injected into <head> by @upptime/status-page; jsDelivr serves
-  # our committed file with the correct text/css MIME type (raw.githubusercontent
-  # serves text/plain, which most browsers refuse to apply as a stylesheet).
-  css:
-    - https://cdn.jsdelivr.net/gh/safwatech/payhub-status@main/global.css
+  logoUrl: https://status.payhub.ly/icon.png
   name: PayHub
   introTitle: PayHub status
   introMessage: |
