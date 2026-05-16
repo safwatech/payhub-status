@@ -1,0 +1,125 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   PayHub brand override for the Upptime status-page Svelte SPA.
+
+   The upstream theme exposes ~20 CSS custom properties on `:root` (see
+   themes/light.css + dark.css in the @upptime/status-page bundle). We
+   override just the ones that carry brand identity — accent, surfaces,
+   borders, button colours — and leave the up/down/degraded traffic-light
+   tags alone (those have universal semantics).
+
+   `global.css` is loaded AFTER both theme files, so these win.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@import url("https://api.fontshare.com/v2/css?f[]=somar-sans@400,500,600,700&display=swap");
+
+/* ─── Light (default) ─────────────────────────────────────────────────── */
+:root {
+  /* PayHub palette */
+  --ph-accent: #F39200;
+  --ph-accent-deep: #C97400;
+  --ph-accent-soft: rgba(243, 146, 0, 0.10);
+  --ph-text: #1a0d00;
+  --ph-text-muted: #6b5a4a;
+  --ph-bg: #fffaf3;        /* warm off-white, matches the landing hero */
+  --ph-card: #ffffff;
+  --ph-border: #e5e1d8;    /* warm soft beige-grey */
+  --ph-border-soft: #efece5;
+
+  /* Upstream Upptime variables — overridden */
+  --body-background-color: var(--ph-bg);
+  --body-text-color: var(--ph-text);
+  --card-background-color: var(--ph-card);
+  --card-border-color: var(--ph-border);
+  --nav-background-color: rgba(255, 255, 255, 0.85);
+  --nav-border-bottom-color: var(--ph-border);
+  --nav-current-border-bottom-color: var(--ph-accent);
+  --error-button-background-color: var(--ph-accent);
+  --error-button-border-color: var(--ph-accent-deep);
+  --error-button-color: #ffffff;
+  --submit-button-background-color: var(--ph-accent);
+  --submit-button-border-color: var(--ph-accent-deep);
+  --submit-button-color: #ffffff;
+  /* up/down/degraded tags intentionally untouched — universal semantics */
+}
+
+/* ─── Dark ────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ph-text: #f5ede0;
+    --ph-text-muted: #b8a994;
+    --ph-bg: #1a0d00;
+    --ph-card: #261a0d;
+    --ph-border: #3d2b18;
+    --ph-border-soft: #2e2010;
+
+    --body-background-color: var(--ph-bg);
+    --body-text-color: var(--ph-text);
+    --card-background-color: var(--ph-card);
+    --card-border-color: var(--ph-border);
+    --nav-background-color: rgba(38, 26, 13, 0.85);
+    --nav-border-bottom-color: var(--ph-border);
+    --nav-current-border-bottom-color: var(--ph-accent);
+  }
+}
+
+/* ─── Typography ──────────────────────────────────────────────────────── */
+body {
+  margin: 0;
+  font-family: "Somar Sans", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  line-height: 1.5;
+  padding-bottom: 2.5rem;
+  letter-spacing: -0.005em;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 0.5em 0;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ph-text);
+}
+
+h1 { font-size: 2.25rem; }
+
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--ph-accent-deep); }
+
+/* ─── Nav refinements ─────────────────────────────────────────────────── */
+/* Upstream sticky-blur nav + brand logo treatment. Selectors are scoped
+   to the elements that nav.svelte renders — class hashes change per
+   build, so we hold onto stable element + structural selectors only. */
+nav { backdrop-filter: saturate(140%) blur(8px); }
+nav .container img {
+  width: 28px; height: 28px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* ─── Card polish ─────────────────────────────────────────────────────── */
+main section > div {
+  border-radius: 10px;
+}
+
+/* ─── Container width — slightly wider feels modern ───────────────────── */
+@media (min-width: 900px) {
+  .container { max-width: 880px; }
+}
+
+/* ─── Footer subtlety ─────────────────────────────────────────────────── */
+footer { color: var(--ph-text-muted); font-size: 0.85rem; }
+footer a { border-bottom: 1px dotted var(--ph-border); }
+
+@media (min-width: 400px) {
+  body { font-size: 16px; }
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
