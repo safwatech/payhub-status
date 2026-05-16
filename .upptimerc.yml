@@ -1,0 +1,50 @@
+owner: safwatech
+repo: payhub-status
+
+sites:
+  - name: PayHub App
+    url: https://app.payhub.ly/
+    expectedStatusCodes: [200]
+    icon: https://payhub.ly/icon.png
+    maxRetries: 3
+
+  - name: PayHub API
+    url: https://app.payhub.ly/v1/health
+    expectedStatusCodes: [200]
+    maxRetries: 3
+
+  - name: PayHub Liveness
+    url: https://app.payhub.ly/healthz
+    expectedStatusCodes: [200]
+    maxRetries: 3
+
+  - name: PayHub Marketing
+    url: https://payhub.ly/
+    expectedStatusCodes: [200]
+    maxRetries: 3
+
+status-website:
+  cname: status.payhub.ly
+  logoUrl: https://payhub.ly/icon.png
+  name: PayHub
+  introTitle: PayHub status
+  introMessage: |
+    Public uptime + response-time history for PayHub's customer-facing
+    surfaces. Probes run every 5 minutes from GitHub Actions runners in
+    North America / Europe. Operator-side dashboards live behind admin
+    SSO.
+  navbar:
+    - title: Status
+      href: /
+    - title: PayHub.ly
+      href: https://payhub.ly/
+    - title: Docs
+      href: https://docs.payhub.ly/
+  workflowSchedule:
+    graphs: "0 0 * * *"
+    responseTime: "0 23 * * *"
+    staticSite: "0 1 * * *"
+    summary: "0 18 * * SAT"
+
+notifications:
+  - type: github
