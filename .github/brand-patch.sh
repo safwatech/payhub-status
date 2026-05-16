@@ -34,6 +34,10 @@ cp apple-touch-icon.png "$EXPORT/apple-touch-icon.png"
 echo "→ Overwriting global.css with PayHub-themed overrides"
 cp global.css "$EXPORT/global.css"
 
+echo "→ Copying self-hosted Somar Sans woff2 files"
+mkdir -p "$EXPORT/fonts"
+cp assets/fonts/*.woff2 "$EXPORT/fonts/"
+
 echo "→ Injecting favicon + theme/UI scripts into rendered <head>"
 python3 - <<'PY'
 import pathlib, re

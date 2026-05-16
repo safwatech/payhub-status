@@ -17,7 +17,45 @@
        prefers-color-scheme media query take over.
    ───────────────────────────────────────────────────────────────────────── */
 
-@import url("https://api.fontshare.com/v2/css?f[]=somar-sans@400,500,600,700,800&display=swap");
+/* Self-hosted Somar Sans. Files live in /fonts/ on the deployed site;
+   the brand-patch.sh copies them into the export tree at build time.
+   Hosting locally avoids the cross-site SameSite=Lax cookie warning
+   from Fontshare's CSS endpoint. */
+@font-face {
+  font-family: "Somar Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/somar-sans-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Somar Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/somar-sans-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Somar Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/somar-sans-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Somar Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/somar-sans-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Somar Sans";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/somar-sans-800.woff2") format("woff2");
+}
 
 /* ─── Theme tokens — light ────────────────────────────────────────────── */
 :root {
