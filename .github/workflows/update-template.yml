@@ -15,11 +15,11 @@
 
 
 name: Update Template CI
-# Manual-only — auto-update disabled because we hand-edited setup.yml + site.yml
-# to apply the PayHub brand (.github/brand-patch.sh). The upstream template
-# updater would overwrite those edits weekly. Re-enable the cron line only if
-# the brand patch has been upstreamed or removed.
 on:
+  schedule:
+    - cron: "0 0 * * *"
+  repository_dispatch:
+    types: [update_template]
   workflow_dispatch:
 jobs:
   release:
