@@ -1,45 +1,56 @@
 /* ─────────────────────────────────────────────────────────────────────────
    PayHub brand override for the Upptime status-page Svelte SPA.
 
-   The upstream theme exposes ~20 CSS custom properties on `:root` (see
-   themes/light.css + dark.css in the @upptime/status-page bundle). We
-   override the ones that carry brand identity — accent, surfaces,
-   borders, button colours — and leave the up/down/degraded traffic-light
-   tags alone (those have universal semantics).
+   Loaded AFTER the upstream theme files, so these win. The upstream
+   build hashes class names per release, so this file only relies on
+   structural and data-attribute selectors. The `data-ph-*` attributes
+   are applied at runtime by the script in brand-patch.sh; runtime
+   tagging means we don't depend on class hashes and survive upstream
+   bumps with no edits.
 
-   Dark mode is driven by `:root[data-theme="dark"]`, set by the inline
-   script in brand-patch.sh. When no explicit theme is set, the @media
-   block below falls back to the OS preference. `global.css` is loaded
-   AFTER both upstream theme files, so these win.
-
-   Class names rendered by the Svelte SPA carry build-time hashes that
-   change on every release, so structural and data-attribute selectors
-   are used throughout. The `data-ph-*` attributes are applied at runtime
-   by the script in brand-patch.sh.
+   Theme model:
+     - Default (no localStorage entry)  → "light" set by the early
+       theme script in brand-patch.sh.
+     - `:root[data-theme="light"]`      → light palette (this file's :root).
+     - `:root[data-theme="dark"]`       → dark palette (override block).
+     - Toggle's third option "system"   → removes data-theme and lets the
+       prefers-color-scheme media query take over.
    ───────────────────────────────────────────────────────────────────────── */
 
-@import url("https://api.fontshare.com/v2/css?f[]=somar-sans@400,500,600,700&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=somar-sans@400,500,600,700,800&display=swap");
 
-/* ─── Theme tokens ────────────────────────────────────────────────────── */
+/* ─── Theme tokens — light ────────────────────────────────────────────── */
 :root {
   --ph-accent: #F39200;
   --ph-accent-deep: #C97400;
   --ph-accent-soft: rgba(243, 146, 0, 0.10);
-  --ph-text: #1a0d00;
-  --ph-text-muted: #6b5a4a;
-  --ph-bg: #fffaf3;
-  --ph-card: #ffffff;
-  --ph-border: #e5e1d8;
-  --ph-border-soft: #efece5;
-  --ph-shadow-sm: 0 1px 2px rgba(40, 22, 0, 0.05);
-  --ph-shadow-md: 0 4px 14px rgba(40, 22, 0, 0.05);
-  --ph-shadow-hover: 0 2px 4px rgba(40, 22, 0, 0.06), 0 10px 24px rgba(40, 22, 0, 0.08);
+  --ph-accent-tint: rgba(243, 146, 0, 0.04);
 
+  --ph-text: #15110b;
+  --ph-text-muted: #6e6353;
+  --ph-text-faint: #9c9082;
+
+  --ph-bg: #fbf7f0;             /* warm parchment */
+  --ph-bg-top: #fff8ec;         /* warmer at the top — subtle gradient */
+  --ph-card: #ffffff;
+  --ph-card-elev: #ffffff;
+  --ph-border: #ebe5d8;
+  --ph-border-soft: #f3eee3;
+
+  --ph-up: #2bb673;
+  --ph-down: #e85a4f;
+  --ph-degraded: #f0a82e;
+
+  --ph-shadow-card: 0 1px 2px rgba(40, 22, 0, 0.04), 0 8px 24px rgba(40, 22, 0, 0.04);
+  --ph-shadow-hover: 0 2px 4px rgba(40, 22, 0, 0.05), 0 14px 32px rgba(40, 22, 0, 0.08);
+  --ph-shadow-pill: 0 1px 3px rgba(243, 146, 0, 0.35);
+
+  /* Upstream Upptime variable overrides */
   --body-background-color: var(--ph-bg);
   --body-text-color: var(--ph-text);
   --card-background-color: var(--ph-card);
-  --card-border-color: var(--ph-border-soft);
-  --nav-background-color: rgba(255, 250, 243, 0.85);
+  --card-border-color: transparent;
+  --nav-background-color: rgba(251, 247, 240, 0.78);
   --nav-border-bottom-color: var(--ph-border);
   --nav-current-border-bottom-color: var(--ph-accent);
   --error-button-background-color: var(--ph-accent);
@@ -50,64 +61,90 @@
   --submit-button-color: #ffffff;
 }
 
-/* Explicit dark — wins regardless of OS pref */
+/* ─── Theme tokens — dark ─────────────────────────────────────────────── */
 :root[data-theme="dark"] {
-  --ph-text: #f5ede0;
-  --ph-text-muted: #a89880;
-  --ph-bg: #14110c;
-  --ph-card: #1d1812;
+  --ph-accent: #FFA51F;
+  --ph-accent-deep: #D78315;
+  --ph-accent-soft: rgba(255, 165, 31, 0.14);
+  --ph-accent-tint: rgba(255, 165, 31, 0.06);
+
+  --ph-text: #f4ecdc;
+  --ph-text-muted: #a89a82;
+  --ph-text-faint: #6e6353;
+
+  --ph-bg: #100d09;
+  --ph-bg-top: #1a1410;
+  --ph-card: #1c1813;
+  --ph-card-elev: #221d17;
   --ph-border: #2c241a;
   --ph-border-soft: #221c14;
-  --ph-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --ph-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
-  --ph-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.5), 0 10px 24px rgba(0, 0, 0, 0.55);
+
+  --ph-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.5);
+  --ph-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 36px rgba(0, 0, 0, 0.6);
+  --ph-shadow-pill: 0 1px 3px rgba(255, 165, 31, 0.35);
 
   --body-background-color: var(--ph-bg);
   --body-text-color: var(--ph-text);
   --card-background-color: var(--ph-card);
-  --card-border-color: var(--ph-border);
-  --nav-background-color: rgba(29, 24, 18, 0.85);
+  --card-border-color: transparent;
+  --nav-background-color: rgba(28, 24, 19, 0.78);
   --nav-border-bottom-color: var(--ph-border);
   --nav-current-border-bottom-color: var(--ph-accent);
 }
 
-/* Auto-OS dark when user hasn't picked a theme */
+/* Auto-OS dark only when user has explicitly chosen "system" — the
+   early theme script defaults new visitors to "light", so this path
+   only fires for users who opted into "system" via the toggle. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
-    --ph-text: #f5ede0;
-    --ph-text-muted: #a89880;
-    --ph-bg: #14110c;
-    --ph-card: #1d1812;
+    --ph-accent: #FFA51F;
+    --ph-accent-deep: #D78315;
+    --ph-accent-soft: rgba(255, 165, 31, 0.14);
+    --ph-accent-tint: rgba(255, 165, 31, 0.06);
+    --ph-text: #f4ecdc;
+    --ph-text-muted: #a89a82;
+    --ph-text-faint: #6e6353;
+    --ph-bg: #100d09;
+    --ph-bg-top: #1a1410;
+    --ph-card: #1c1813;
+    --ph-card-elev: #221d17;
     --ph-border: #2c241a;
     --ph-border-soft: #221c14;
-    --ph-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --ph-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
-    --ph-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.5), 0 10px 24px rgba(0, 0, 0, 0.55);
-
+    --ph-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.5);
+    --ph-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 36px rgba(0, 0, 0, 0.6);
+    --ph-shadow-pill: 0 1px 3px rgba(255, 165, 31, 0.35);
     --body-background-color: var(--ph-bg);
     --body-text-color: var(--ph-text);
     --card-background-color: var(--ph-card);
-    --card-border-color: var(--ph-border);
-    --nav-background-color: rgba(29, 24, 18, 0.85);
+    --card-border-color: transparent;
+    --nav-background-color: rgba(28, 24, 19, 0.78);
     --nav-border-bottom-color: var(--ph-border);
   }
 }
 
-/* ─── Typography ──────────────────────────────────────────────────────── */
+/* ─── Base / typography ───────────────────────────────────────────────── */
+html { background-color: var(--ph-bg); }
 body {
   margin: 0;
   font-family: "Somar Sans", -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   font-weight: 500;
   line-height: 1.55;
-  padding-bottom: 2.5rem;
   letter-spacing: -0.005em;
-  font-feature-settings: "ss01", "cv11";
+  font-feature-settings: "ss01", "cv11", "tnum";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--ph-text);
-  background-color: var(--ph-bg);
+  /* Subtle warm radial wash at the top — adds depth, stays out of content's way. */
+  background:
+    radial-gradient(ellipse 120% 600px at 50% -100px,
+      var(--ph-bg-top) 0%,
+      transparent 65%),
+    var(--ph-bg);
+  padding-bottom: 4rem;
+  min-height: 100vh;
 }
+@media (min-width: 400px) { body { font-size: 16px; } }
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0 0 0.5em 0;
@@ -116,35 +153,37 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.025em;
   color: var(--ph-text);
 }
-
-h1 { font-size: 2.5rem; }
-h2 { font-size: 1.5rem; letter-spacing: -0.02em; }
+h1 { font-size: 2.75rem; font-weight: 800; letter-spacing: -0.035em; }
+h2 { font-size: 1.625rem; letter-spacing: -0.02em; margin-top: 1.5rem; }
 h3 { font-size: 1.125rem; }
+p  { color: var(--ph-text); }
 
-a { color: inherit; text-decoration: none; }
+a  { color: inherit; text-decoration: none; transition: color 140ms ease; }
 a:hover { color: var(--ph-accent-deep); }
 
-/* ─── Container width ─────────────────────────────────────────────────── */
+/* ─── Container ───────────────────────────────────────────────────────── */
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   box-sizing: border-box;
 }
 @media (min-width: 900px) {
-  .container { max-width: 880px; }
-}
-@media (min-width: 400px) {
-  body { font-size: 16px; }
+  .container { max-width: 920px; padding: 0 2rem; }
 }
 
 /* ─── Nav ─────────────────────────────────────────────────────────────── */
-/* Selectors stay structural — class hashes change per upstream build. */
-nav { backdrop-filter: saturate(140%) blur(8px); }
+nav {
+  backdrop-filter: saturate(140%) blur(12px);
+  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
 nav .container img {
   width: 28px; height: 28px;
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: 7px;
 }
 
 /* ─── Theme toggle button (injected into nav <ul>) ────────────────────── */
@@ -157,84 +196,146 @@ nav .container img {
   padding: 0;
   border: 1px solid var(--ph-border);
   background: transparent;
-  border-radius: 8px;
+  border-radius: 9px;
   color: var(--ph-text-muted);
   cursor: pointer;
-  transition: color 140ms ease, background 140ms ease, border-color 140ms ease;
+  transition: color 140ms ease, background 140ms ease, border-color 140ms ease, transform 120ms ease;
 }
 .ph-theme-toggle:hover {
   color: var(--ph-accent);
   border-color: var(--ph-accent);
   background: var(--ph-accent-soft);
 }
+.ph-theme-toggle:active { transform: scale(0.96); }
 .ph-theme-toggle:focus-visible {
   outline: 2px solid var(--ph-accent);
   outline-offset: 2px;
 }
-.ph-theme-toggle svg {
-  width: 18px;
-  height: 18px;
-  display: block;
-}
-/* The nav <ul> is a flex row; the toggle <li> needs no bullet/padding */
+.ph-theme-toggle svg { width: 18px; height: 18px; display: block; }
 nav ul li.ph-theme-toggle-item {
   list-style: none;
   display: inline-flex;
   align-items: center;
 }
 
-/* ─── Service cards ───────────────────────────────────────────────────── */
-/* main section > div is the stable structural path for each site card. */
+/* ─── Service cards (stable structural selector) ──────────────────────── */
 main section > div {
-  border-radius: 12px !important;
-  border: 1px solid var(--ph-border-soft) !important;
+  border-radius: 14px !important;
+  border: 0 !important;
   background-color: var(--ph-card) !important;
-  box-shadow: var(--ph-shadow-sm), var(--ph-shadow-md);
+  box-shadow: var(--ph-shadow-card);
   padding: 1.25rem 1.5rem !important;
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  margin-bottom: 0.875rem !important;
+  transition: transform 200ms cubic-bezier(.2,.7,.2,1),
+              box-shadow 200ms ease,
+              background-color 200ms ease;
 }
 main section > div:hover {
-  transform: translateY(-1px);
-  border-color: var(--ph-accent) !important;
+  transform: translateY(-2px);
   box-shadow: var(--ph-shadow-hover);
+  background-color: var(--ph-card-elev) !important;
+}
+
+/* Up/down/degraded status pills — modernized but still semantic */
+main section > div .tag,
+main section > div [class*="up"],
+main section > div [class*="down"],
+main section > div [class*="degraded"] {
+  /* The upstream `.tag` ish elements vary; the most reliable thing we
+     can do is leave their colors alone (kept as universal traffic
+     lights) and just round + space them via the structural selector
+     below. */
+}
+/* The tag is typically the last small <span> in the card row — give it
+   pill rounding without overriding upstream colours. */
+main section > div span[class] {
+  border-radius: 999px !important;
 }
 
 /* ─── Time-range segmented control ────────────────────────────────────── */
-/* The container is tagged with [data-ph-range-tabs] at runtime by the
-   brand-patch script after the SPA hydrates. Its child <button>s become
-   pill segments; the active one is marked with [data-ph-active]. */
+/* The brand-patch JS tags the <form> that holds the 5 radio+label
+   pairs with [data-ph-range-tabs]. Active state is the native
+   :checked — no JS sync needed. */
 [data-ph-range-tabs] {
-  display: inline-flex;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  gap: 2px;
   background: var(--ph-accent-soft);
   border-radius: 999px;
   padding: 4px;
-  gap: 2px;
-  margin: 0.25rem 0 1rem 0;
+  margin: 0.25rem 0 1.25rem 0;
+  border: 0 !important;
 }
-[data-ph-range-tabs] button {
-  appearance: none;
-  border: none !important;
-  background: transparent !important;
-  border-radius: 999px !important;
-  padding: 0.4rem 0.9rem !important;
-  font: inherit;
-  font-weight: 600 !important;
-  font-size: 0.875rem !important;
-  color: var(--ph-text-muted) !important;
+[data-ph-range-tabs] > div {
+  display: inline-flex;
+  position: relative;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+[data-ph-range-tabs] input[type="radio"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  margin: 0;
   cursor: pointer;
-  transition: background 140ms ease, color 140ms ease;
-  min-width: auto !important;
+  /* keep above the label for click handling */
+  z-index: 1;
 }
-[data-ph-range-tabs] button:hover {
-  background: rgba(243, 146, 0, 0.10) !important;
-  color: var(--ph-text) !important;
+[data-ph-range-tabs] label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1;
+  color: var(--ph-text-muted);
+  background: transparent;
+  transition: background 160ms ease, color 160ms ease, transform 100ms ease;
+  user-select: none;
+  white-space: nowrap;
 }
-[data-ph-range-tabs] button[data-ph-active] {
-  background: var(--ph-accent) !important;
-  color: #ffffff !important;
-  box-shadow: 0 1px 3px rgba(243, 146, 0, 0.35);
+[data-ph-range-tabs] label:hover { color: var(--ph-text); background: var(--ph-accent-tint); }
+[data-ph-range-tabs] input[type="radio"]:checked + label {
+  background: var(--ph-accent);
+  color: #ffffff;
+  box-shadow: var(--ph-shadow-pill);
 }
+[data-ph-range-tabs] input[type="radio"]:focus-visible + label {
+  outline: 2px solid var(--ph-accent);
+  outline-offset: 2px;
+}
+[data-ph-range-tabs] input[type="radio"]:active + label { transform: scale(0.97); }
+
+/* ─── Hero / intro ────────────────────────────────────────────────────── */
+main > section:first-of-type,
+main > h1:first-child,
+main > div:first-child {
+  margin-top: 1rem;
+}
+/* h1 inside <main> gets a touch more air to feel like a hero, not a list item */
+main h1 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
+main h1 + p { color: var(--ph-text-muted); max-width: 64ch; }
 
 /* ─── Footer ──────────────────────────────────────────────────────────── */
-footer { color: var(--ph-text-muted); font-size: 0.85rem; }
-footer a { border-bottom: 1px dotted var(--ph-border); }
+footer {
+  color: var(--ph-text-faint);
+  font-size: 0.85rem;
+  padding-top: 2rem;
+}
+footer a {
+  color: var(--ph-text-muted);
+  border-bottom: 1px dotted var(--ph-border);
+}
+footer a:hover { color: var(--ph-accent-deep); border-bottom-color: var(--ph-accent); }
+
+/* ─── Small refinements ───────────────────────────────────────────────── */
+::selection {
+  background-color: var(--ph-accent);
+  color: #ffffff;
+}

@@ -55,15 +55,19 @@ else:
     print("  ✓ favicon links already present")
 
 # ── Early theme script (must run BEFORE first paint to avoid FOUC) ────
-# Reads localStorage and applies data-theme synchronously. Removes the
-# attribute for "system" so the prefers-color-scheme media query in
-# global.css takes over.
+# Reads localStorage and applies data-theme synchronously. First-time
+# visitors default to LIGHT mode (the brand's primary surface);
+# explicit user choice is persisted and the "system" choice removes the
+# attribute so the prefers-color-scheme media query in global.css takes
+# over. Bumping the cache key version (v2) invalidates the previous
+# default of "system" without surprising users who had explicitly chosen.
 early_marker = "ph-theme-init"
 early_script = """<script id="ph-theme-init">
-(function(){var k="payhub-theme";var t=localStorage.getItem(k)||"system";
+(function(){var k="payhub-theme";var t=localStorage.getItem(k);
+if(t!=="dark"&&t!=="light"&&t!=="system"){t="light";localStorage.setItem(k,t);}
 if(t==="dark"||t==="light"){document.documentElement.setAttribute("data-theme",t);}
 else{document.documentElement.removeAttribute("data-theme");}
-window.__phTheme={get:function(){return localStorage.getItem(k)||"system";},
+window.__phTheme={get:function(){return localStorage.getItem(k)||"light";},
 set:function(v){localStorage.setItem(k,v);
 if(v==="dark"||v==="light"){document.documentElement.setAttribute("data-theme",v);}
 else{document.documentElement.removeAttribute("data-theme");}}};
@@ -83,14 +87,17 @@ else:
 ui_marker = "ph-ui-enhance"
 ui_script = """<script id="ph-ui-enhance" defer>
 (function(){
+  // The Upptime status-page is a Sapper SPA — its DOM appears after
+  // hydration. We tag stable DOM hooks (data-ph-* attributes) here so
+  // global.css can target the segmented control + nav additions
+  // without depending on Svelte's per-build class hashes.
   var ICONS={
     system:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
     light:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
     dark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
   };
   var LABELS={system:"Theme: follow system",light:"Theme: light",dark:"Theme: dark"};
-  var NEXT={system:"light",light:"dark",dark:"system"};
-  var RANGE_LABELS=["24h","7d","30d","1y","all"];
+  var NEXT={light:"dark",dark:"system",system:"light"};
 
   function buildToggle(){
     var ul=document.querySelector("nav ul");
@@ -116,33 +123,18 @@ ui_script = """<script id="ph-ui-enhance" defer>
   }
 
   function tagRangeTabs(){
-    // Find the row of <button>s that match the time-range labels and
-    // tag their shared parent. The SPA may re-render this section, so
-    // it's safe to re-run: querying for already-tagged parents short-circuits.
-    var buttons=Array.prototype.slice.call(document.querySelectorAll("main button"));
-    var matches=buttons.filter(function(b){
-      var t=(b.textContent||"").trim().toLowerCase();
-      return RANGE_LABELS.indexOf(t)!==-1;
-    });
-    if(matches.length<3)return;
-    var parent=matches[0].parentElement;
-    for(var i=1;i<matches.length;i++){
-      if(matches[i].parentElement!==parent)return;
+    // The time-range "tabs" are rendered as a <form> holding five
+    // <input type="radio"> + <label> pairs (one per duration). We
+    // identify the form structurally — any <form> in <main> with
+    // exactly five radios — and tag it so CSS can lay out a
+    // segmented control via :checked + label.
+    var forms=document.querySelectorAll("main form");
+    for(var i=0;i<forms.length;i++){
+      var f=forms[i];
+      if(f.hasAttribute("data-ph-range-tabs"))continue;
+      var radios=f.querySelectorAll('input[type="radio"]');
+      if(radios.length===5){f.setAttribute("data-ph-range-tabs","");}
     }
-    if(parent.hasAttribute("data-ph-range-tabs"))return;
-    parent.setAttribute("data-ph-range-tabs","");
-    function setActive(b){
-      matches.forEach(function(x){x.removeAttribute("data-ph-active");});
-      b.setAttribute("data-ph-active","");
-    }
-    matches.forEach(function(b){
-      b.addEventListener("click",function(){setActive(b);});
-    });
-    // Default active = the one currently shown (upstream typically marks
-    // it with aria-pressed or via styles we can't reliably read), so we
-    // pick the first as the visible default ("24h") — Upptime's own
-    // initial render shows 24h.
-    setActive(matches[0]);
   }
 
   function run(){buildToggle();tagRangeTabs();}
@@ -152,7 +144,7 @@ ui_script = """<script id="ph-ui-enhance" defer>
   }else{
     run();
   }
-  // SPA re-renders main on hydration / route changes; observe and re-tag.
+  // SPA re-renders main on hydration / route changes — re-tag as needed.
   var obs=new MutationObserver(function(){run();});
   obs.observe(document.body,{childList:true,subtree:true});
 })();

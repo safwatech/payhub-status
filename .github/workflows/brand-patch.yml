@@ -1,0 +1,84 @@
+# PayHub brand-patch safety net.
+#
+# The inline "Apply PayHub brand" step in site.yml and setup.yml gets
+# wiped whenever Upptime's "update-template" command regenerates the
+# workflow files (every upstream version bump). This workflow lives in
+# a file Upptime doesn't know about, so it survives those regens.
+#
+# Triggers:
+#   - workflow_run on Static Site CI / Setup CI completion → catches the
+#     case where the inline brand step was missing or failed.
+#   - push to main touching brand files → fast iteration loop for CSS
+#     and asset changes without waiting for the daily probe-triggered
+#     site rebuild.
+#
+# Strategy: check out the deployed gh-pages branch, alias it to the
+# location brand-patch.sh expects, run the script (idempotent — files
+# get overwritten, head injections are substring-guarded), then commit
+# & push back. If nothing changes, the workflow exits silently without
+# creating an empty commit.
+
+name: Brand Patch CI
+on:
+  workflow_run:
+    workflows: ["Static Site CI", "Setup CI"]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - global.css
+      - .github/brand-patch.sh
+      - .github/workflows/brand-patch.yml
+      - 'assets/**'
+      - 'favicon*'
+      - 'logo-*.png'
+      - apple-touch-icon.png
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    name: Re-apply PayHub brand to gh-pages
+    runs-on: ubuntu-latest
+    # Skip the workflow_run leg unless the upstream run actually succeeded.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout main (source of brand-patch + assets)
+        uses: actions/checkout@v4
+        with:
+          path: main
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Checkout gh-pages (the deployed site)
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Apply brand patch to gh-pages
+        working-directory: main
+        run: |
+          # brand-patch.sh expects the Upptime export tree at
+          # site/status-page/__sapper__/export. The gh-pages branch
+          # *is* that tree at its root, so we point the script at it
+          # via a symlink to reuse the existing logic verbatim.
+          mkdir -p site/status-page/__sapper__
+          ln -s "$GITHUB_WORKSPACE/gh-pages" site/status-page/__sapper__/export
+          bash .github/brand-patch.sh
+
+      - name: Commit & push if anything changed
+        working-directory: gh-pages
+        run: |
+          git config user.name "PayHub Brand Bot"
+          git config user.email "73812536+upptime-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "✓ gh-pages already branded — nothing to push."
+          else
+            git commit -m "🎨 Re-apply PayHub brand patch [skip ci]"
+            git push origin gh-pages
+            echo "✓ Brand re-applied and pushed."
+          fi
