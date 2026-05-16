@@ -3,34 +3,43 @@
 
    The upstream theme exposes ~20 CSS custom properties on `:root` (see
    themes/light.css + dark.css in the @upptime/status-page bundle). We
-   override just the ones that carry brand identity — accent, surfaces,
+   override the ones that carry brand identity — accent, surfaces,
    borders, button colours — and leave the up/down/degraded traffic-light
    tags alone (those have universal semantics).
 
-   `global.css` is loaded AFTER both theme files, so these win.
+   Dark mode is driven by `:root[data-theme="dark"]`, set by the inline
+   script in brand-patch.sh. When no explicit theme is set, the @media
+   block below falls back to the OS preference. `global.css` is loaded
+   AFTER both upstream theme files, so these win.
+
+   Class names rendered by the Svelte SPA carry build-time hashes that
+   change on every release, so structural and data-attribute selectors
+   are used throughout. The `data-ph-*` attributes are applied at runtime
+   by the script in brand-patch.sh.
    ───────────────────────────────────────────────────────────────────────── */
 
 @import url("https://api.fontshare.com/v2/css?f[]=somar-sans@400,500,600,700&display=swap");
 
-/* ─── Light (default) ─────────────────────────────────────────────────── */
+/* ─── Theme tokens ────────────────────────────────────────────────────── */
 :root {
-  /* PayHub palette */
   --ph-accent: #F39200;
   --ph-accent-deep: #C97400;
   --ph-accent-soft: rgba(243, 146, 0, 0.10);
   --ph-text: #1a0d00;
   --ph-text-muted: #6b5a4a;
-  --ph-bg: #fffaf3;        /* warm off-white, matches the landing hero */
+  --ph-bg: #fffaf3;
   --ph-card: #ffffff;
-  --ph-border: #e5e1d8;    /* warm soft beige-grey */
+  --ph-border: #e5e1d8;
   --ph-border-soft: #efece5;
+  --ph-shadow-sm: 0 1px 2px rgba(40, 22, 0, 0.05);
+  --ph-shadow-md: 0 4px 14px rgba(40, 22, 0, 0.05);
+  --ph-shadow-hover: 0 2px 4px rgba(40, 22, 0, 0.06), 0 10px 24px rgba(40, 22, 0, 0.08);
 
-  /* Upstream Upptime variables — overridden */
   --body-background-color: var(--ph-bg);
   --body-text-color: var(--ph-text);
   --card-background-color: var(--ph-card);
-  --card-border-color: var(--ph-border);
-  --nav-background-color: rgba(255, 255, 255, 0.85);
+  --card-border-color: var(--ph-border-soft);
+  --nav-background-color: rgba(255, 250, 243, 0.85);
   --nav-border-bottom-color: var(--ph-border);
   --nav-current-border-bottom-color: var(--ph-accent);
   --error-button-background-color: var(--ph-accent);
@@ -39,26 +48,48 @@
   --submit-button-background-color: var(--ph-accent);
   --submit-button-border-color: var(--ph-accent-deep);
   --submit-button-color: #ffffff;
-  /* up/down/degraded tags intentionally untouched — universal semantics */
 }
 
-/* ─── Dark ────────────────────────────────────────────────────────────── */
+/* Explicit dark — wins regardless of OS pref */
+:root[data-theme="dark"] {
+  --ph-text: #f5ede0;
+  --ph-text-muted: #a89880;
+  --ph-bg: #14110c;
+  --ph-card: #1d1812;
+  --ph-border: #2c241a;
+  --ph-border-soft: #221c14;
+  --ph-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --ph-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --ph-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.5), 0 10px 24px rgba(0, 0, 0, 0.55);
+
+  --body-background-color: var(--ph-bg);
+  --body-text-color: var(--ph-text);
+  --card-background-color: var(--ph-card);
+  --card-border-color: var(--ph-border);
+  --nav-background-color: rgba(29, 24, 18, 0.85);
+  --nav-border-bottom-color: var(--ph-border);
+  --nav-current-border-bottom-color: var(--ph-accent);
+}
+
+/* Auto-OS dark when user hasn't picked a theme */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
     --ph-text: #f5ede0;
-    --ph-text-muted: #b8a994;
-    --ph-bg: #1a0d00;
-    --ph-card: #261a0d;
-    --ph-border: #3d2b18;
-    --ph-border-soft: #2e2010;
+    --ph-text-muted: #a89880;
+    --ph-bg: #14110c;
+    --ph-card: #1d1812;
+    --ph-border: #2c241a;
+    --ph-border-soft: #221c14;
+    --ph-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --ph-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
+    --ph-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.5), 0 10px 24px rgba(0, 0, 0, 0.55);
 
     --body-background-color: var(--ph-bg);
     --body-text-color: var(--ph-text);
     --card-background-color: var(--ph-card);
     --card-border-color: var(--ph-border);
-    --nav-background-color: rgba(38, 26, 13, 0.85);
+    --nav-background-color: rgba(29, 24, 18, 0.85);
     --nav-border-bottom-color: var(--ph-border);
-    --nav-current-border-bottom-color: var(--ph-accent);
   }
 }
 
@@ -67,31 +98,48 @@ body {
   margin: 0;
   font-family: "Somar Sans", -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  line-height: 1.5;
+  font-weight: 500;
+  line-height: 1.55;
   padding-bottom: 2.5rem;
   letter-spacing: -0.005em;
   font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: var(--ph-text);
+  background-color: var(--ph-bg);
 }
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0 0 0.5em 0;
   font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
   color: var(--ph-text);
 }
 
-h1 { font-size: 2.25rem; }
+h1 { font-size: 2.5rem; }
+h2 { font-size: 1.5rem; letter-spacing: -0.02em; }
+h3 { font-size: 1.125rem; }
 
 a { color: inherit; text-decoration: none; }
 a:hover { color: var(--ph-accent-deep); }
 
-/* ─── Nav refinements ─────────────────────────────────────────────────── */
-/* Upstream sticky-blur nav + brand logo treatment. Selectors are scoped
-   to the elements that nav.svelte renders — class hashes change per
-   build, so we hold onto stable element + structural selectors only. */
+/* ─── Container width ─────────────────────────────────────────────────── */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
+@media (min-width: 900px) {
+  .container { max-width: 880px; }
+}
+@media (min-width: 400px) {
+  body { font-size: 16px; }
+}
+
+/* ─── Nav ─────────────────────────────────────────────────────────────── */
+/* Selectors stay structural — class hashes change per upstream build. */
 nav { backdrop-filter: saturate(140%) blur(8px); }
 nav .container img {
   width: 28px; height: 28px;
@@ -99,27 +147,94 @@ nav .container img {
   border-radius: 6px;
 }
 
-/* ─── Card polish ─────────────────────────────────────────────────────── */
+/* ─── Theme toggle button (injected into nav <ul>) ────────────────────── */
+.ph-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--ph-border);
+  background: transparent;
+  border-radius: 8px;
+  color: var(--ph-text-muted);
+  cursor: pointer;
+  transition: color 140ms ease, background 140ms ease, border-color 140ms ease;
+}
+.ph-theme-toggle:hover {
+  color: var(--ph-accent);
+  border-color: var(--ph-accent);
+  background: var(--ph-accent-soft);
+}
+.ph-theme-toggle:focus-visible {
+  outline: 2px solid var(--ph-accent);
+  outline-offset: 2px;
+}
+.ph-theme-toggle svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+/* The nav <ul> is a flex row; the toggle <li> needs no bullet/padding */
+nav ul li.ph-theme-toggle-item {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ─── Service cards ───────────────────────────────────────────────────── */
+/* main section > div is the stable structural path for each site card. */
 main section > div {
-  border-radius: 10px;
+  border-radius: 12px !important;
+  border: 1px solid var(--ph-border-soft) !important;
+  background-color: var(--ph-card) !important;
+  box-shadow: var(--ph-shadow-sm), var(--ph-shadow-md);
+  padding: 1.25rem 1.5rem !important;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+main section > div:hover {
+  transform: translateY(-1px);
+  border-color: var(--ph-accent) !important;
+  box-shadow: var(--ph-shadow-hover);
 }
 
-/* ─── Container width — slightly wider feels modern ───────────────────── */
-@media (min-width: 900px) {
-  .container { max-width: 880px; }
+/* ─── Time-range segmented control ────────────────────────────────────── */
+/* The container is tagged with [data-ph-range-tabs] at runtime by the
+   brand-patch script after the SPA hydrates. Its child <button>s become
+   pill segments; the active one is marked with [data-ph-active]. */
+[data-ph-range-tabs] {
+  display: inline-flex;
+  background: var(--ph-accent-soft);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 2px;
+  margin: 0.25rem 0 1rem 0;
+}
+[data-ph-range-tabs] button {
+  appearance: none;
+  border: none !important;
+  background: transparent !important;
+  border-radius: 999px !important;
+  padding: 0.4rem 0.9rem !important;
+  font: inherit;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  color: var(--ph-text-muted) !important;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+  min-width: auto !important;
+}
+[data-ph-range-tabs] button:hover {
+  background: rgba(243, 146, 0, 0.10) !important;
+  color: var(--ph-text) !important;
+}
+[data-ph-range-tabs] button[data-ph-active] {
+  background: var(--ph-accent) !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(243, 146, 0, 0.35);
 }
 
-/* ─── Footer subtlety ─────────────────────────────────────────────────── */
+/* ─── Footer ──────────────────────────────────────────────────────────── */
 footer { color: var(--ph-text-muted); font-size: 0.85rem; }
 footer a { border-bottom: 1px dotted var(--ph-border); }
-
-@media (min-width: 400px) {
-  body { font-size: 16px; }
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  box-sizing: border-box;
-}
