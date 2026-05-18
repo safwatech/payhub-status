@@ -62,8 +62,6 @@ jobs:
           command: "site"
         env:
           GH_PAT: ${{ secrets.GH_PAT || github.token }}
-      - name: Apply PayHub brand
-        run: bash .github/brand-patch.sh
       - uses: peaceiris/actions-gh-pages@v4
         name: GitHub Pages Deploy
         with:
