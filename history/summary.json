@@ -4,71 +4,79 @@
     "url": "https://app.payhub.ly/",
     "icon": "https://status.payhub.ly/icon.png",
     "slug": "pay-hub-app",
-    "status": "up",
-    "uptime": "100.00%",
-    "uptimeDay": "100.00%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
+    "status": "down",
+    "uptime": "99.88%",
+    "uptimeDay": "98.98%",
+    "uptimeWeek": "99.85%",
+    "uptimeMonth": "99.88%",
+    "uptimeYear": "99.88%",
     "time": 862,
-    "timeDay": 789,
-    "timeWeek": 822,
+    "timeDay": 0,
+    "timeWeek": 834,
     "timeMonth": 862,
     "timeYear": 862,
-    "dailyMinutesDown": {}
+    "dailyMinutesDown": {
+      "2026-05-25": 15
+    }
   },
   {
     "name": "PayHub API",
     "url": "https://app.payhub.ly/v1/health",
     "icon": "https://icons.duckduckgo.com/ip3/app.payhub.ly.ico",
     "slug": "pay-hub-api",
-    "status": "up",
-    "uptime": "100.00%",
-    "uptimeDay": "100.00%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
+    "status": "down",
+    "uptime": "99.92%",
+    "uptimeDay": "99.32%",
+    "uptimeWeek": "99.90%",
+    "uptimeMonth": "99.92%",
+    "uptimeYear": "99.92%",
     "time": 430,
-    "timeDay": 377,
-    "timeWeek": 424,
+    "timeDay": 0,
+    "timeWeek": 420,
     "timeMonth": 430,
     "timeYear": 430,
-    "dailyMinutesDown": {}
+    "dailyMinutesDown": {
+      "2026-05-25": 10
+    }
   },
   {
     "name": "PayHub Liveness",
     "url": "https://app.payhub.ly/healthz",
     "icon": "https://icons.duckduckgo.com/ip3/app.payhub.ly.ico",
     "slug": "pay-hub-liveness",
-    "status": "up",
-    "uptime": "100.00%",
-    "uptimeDay": "100.00%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
+    "status": "down",
+    "uptime": "99.96%",
+    "uptimeDay": "99.66%",
+    "uptimeWeek": "99.95%",
+    "uptimeMonth": "99.96%",
+    "uptimeYear": "99.96%",
     "time": 393,
-    "timeDay": 405,
-    "timeWeek": 380,
+    "timeDay": 0,
+    "timeWeek": 378,
     "timeMonth": 393,
     "timeYear": 393,
-    "dailyMinutesDown": {}
+    "dailyMinutesDown": {
+      "2026-05-25": 5
+    }
   },
   {
     "name": "PayHub Marketing",
     "url": "https://payhub.ly/",
     "icon": "https://icons.duckduckgo.com/ip3/payhub.ly.ico",
     "slug": "pay-hub-marketing",
-    "status": "up",
+    "status": "down",
     "uptime": "100.00%",
     "uptimeDay": "100.00%",
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
     "time": 706,
-    "timeDay": 798,
-    "timeWeek": 721,
+    "timeDay": 0,
+    "timeWeek": 731,
     "timeMonth": 706,
     "timeYear": 706,
-    "dailyMinutesDown": {}
+    "dailyMinutesDown": {
+      "2026-05-25": 0
+    }
   }
 ]
