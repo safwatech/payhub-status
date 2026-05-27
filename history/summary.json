@@ -5,18 +5,20 @@
     "icon": "https://status.payhub.ly/icon.png",
     "slug": "pay-hub-app",
     "status": "down",
-    "uptime": "99.75%",
-    "uptimeDay": "97.80%",
-    "uptimeWeek": "99.69%",
-    "uptimeMonth": "99.75%",
-    "uptimeYear": "99.75%",
+    "uptime": "81.38%",
+    "uptimeDay": "0.00%",
+    "uptimeWeek": "71.26%",
+    "uptimeMonth": "81.38%",
+    "uptimeYear": "81.38%",
     "time": 862,
     "timeDay": 0,
-    "timeWeek": 834,
+    "timeWeek": 835,
     "timeMonth": 862,
     "timeYear": 862,
     "dailyMinutesDown": {
-      "2026-05-25": 32
+      "2026-05-27": 755,
+      "2026-05-26": 1440,
+      "2026-05-25": 701
     }
   },
   {
@@ -25,18 +27,20 @@
     "icon": "https://icons.duckduckgo.com/ip3/app.payhub.ly.ico",
     "slug": "pay-hub-api",
     "status": "down",
-    "uptime": "99.79%",
-    "uptimeDay": "98.14%",
-    "uptimeWeek": "99.73%",
-    "uptimeMonth": "99.79%",
-    "uptimeYear": "99.79%",
+    "uptime": "81.41%",
+    "uptimeDay": "0.00%",
+    "uptimeWeek": "71.31%",
+    "uptimeMonth": "81.41%",
+    "uptimeYear": "81.41%",
     "time": 430,
     "timeDay": 0,
     "timeWeek": 420,
     "timeMonth": 430,
     "timeYear": 430,
     "dailyMinutesDown": {
-      "2026-05-25": 27
+      "2026-05-27": 755,
+      "2026-05-26": 1440,
+      "2026-05-25": 697
     }
   },
   {
@@ -45,18 +49,20 @@
     "icon": "https://icons.duckduckgo.com/ip3/app.payhub.ly.ico",
     "slug": "pay-hub-liveness",
     "status": "down",
-    "uptime": "99.83%",
-    "uptimeDay": "98.48%",
-    "uptimeWeek": "99.78%",
-    "uptimeMonth": "99.83%",
-    "uptimeYear": "99.83%",
+    "uptime": "81.44%",
+    "uptimeDay": "0.00%",
+    "uptimeWeek": "71.36%",
+    "uptimeMonth": "81.44%",
+    "uptimeYear": "81.44%",
     "time": 393,
     "timeDay": 0,
-    "timeWeek": 378,
+    "timeWeek": 401,
     "timeMonth": 393,
     "timeYear": 393,
     "dailyMinutesDown": {
-      "2026-05-25": 22
+      "2026-05-27": 755,
+      "2026-05-26": 1440,
+      "2026-05-25": 692
     }
   },
   {
@@ -65,18 +71,20 @@
     "icon": "https://icons.duckduckgo.com/ip3/payhub.ly.ico",
     "slug": "pay-hub-marketing",
     "status": "down",
-    "uptime": "99.87%",
-    "uptimeDay": "98.82%",
-    "uptimeWeek": "99.83%",
-    "uptimeMonth": "99.87%",
-    "uptimeYear": "99.87%",
+    "uptime": "81.48%",
+    "uptimeDay": "0.00%",
+    "uptimeWeek": "71.41%",
+    "uptimeMonth": "81.48%",
+    "uptimeYear": "81.48%",
     "time": 706,
     "timeDay": 0,
-    "timeWeek": 731,
+    "timeWeek": 776,
     "timeMonth": 706,
     "timeYear": 706,
     "dailyMinutesDown": {
-      "2026-05-25": 17
+      "2026-05-27": 755,
+      "2026-05-26": 1440,
+      "2026-05-25": 687
     }
   }
 ]
